@@ -1,0 +1,288 @@
+{
+  "name": "nagini-ide",
+  "displayName": "Nagini IDE",
+  "description": "This VS Code extension provides interactive IDE features for verifying Python programs with the Nagini verifier.",
+  "version": "0.0.1",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Programming Methodology Group, ETH Zurich"
+  },
+  "publisher": "viper-admin",
+  "icon": "images/nagini_icon.png",
+  "homepage": "https://www.pm.inf.ethz.ch/research/nagini.html",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/viperproject/nagini-ide"
+  },
+  "bugs": {
+    "url": "https://github.com/viperproject/nagini-ide/issues"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "nagini",
+    "python",
+    "verification",
+    "viper"
+  ],
+  "engines": {
+    "vscode": "^1.111.0"
+  },
+  "activationEvents": [
+    "onLanguage:python"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "nagini.selectEnvironment",
+        "title": "Nagini: Select Environment"
+      },
+      {
+        "command": "nagini.installNagini",
+        "title": "Nagini: Install Nagini"
+      },
+      {
+        "command": "nagini.toggleMode",
+        "title": "Nagini: Toggle Mode"
+      },
+      {
+        "command": "nagini.selectBackend",
+        "title": "Nagini: Select Backend"
+      },
+      {
+        "command": "nagini.startVerification",
+        "title": "Nagini: Start Verification",
+        "icon": "$(unverified)"
+      },
+      {
+        "command": "nagini.stopVerification",
+        "title": "Nagini: Stop Verification"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "nagini.startVerification",
+        "key": "f5",
+        "mac": "f5",
+        "when": "resourceLangId == python"
+      },
+      {
+        "command": "nagini.stopVerification",
+        "key": "shift+f5",
+        "mac": "shift+f5",
+        "when": "resourceLangId == python"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "nagini.selectEnvironment",
+          "when": "resourceLangId == python",
+          "group": "Nagini"
+        },
+        {
+          "command": "nagini.installNagini",
+          "when": "resourceLangId == python",
+          "group": "Nagini"
+        },
+        {
+        "command": "nagini.toggleMode",
+          "when": "resourceLangId == python",
+          "group": "Nagini"
+        },
+        {
+          "command": "nagini.selectBackend",
+          "when": "resourceLangId == python",
+          "group": "Nagini"
+        },
+        {
+          "command": "nagini.startVerification",
+          "when": "resourceLangId == python",
+          "group": "Nagini"
+        },
+        {
+          "command": "nagini.stopVerification",
+          "when": "resourceLangId == python",
+          "group": "Nagini"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "nagini.startVerification",
+          "when": "resourceLangId == python",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Nagini",
+      "properties": {
+        "nagini.paths.boogieExecutable": {
+          "type": "string",
+          "description": "Path to the Boogie executable. (required by Carbon)"
+        },
+        "nagini.verification.timeout": {
+          "type": "number",
+          "default": 60,
+          "minimum": 0,
+          "description": "Maximum verification duration in seconds before the operation is cancelled. Set to 0 for no timeout."
+        }
+      }
+    },
+    "snippets": [
+      {
+        "language": "python",
+        "path": "./snippets/nagini.json"
+      }
+    ],
+    "colors": [
+      {
+        "id": "nagini.adt",
+        "description": "Syntax highlighting for annotations from adt.py.",
+        "defaults": {
+          "dark": "#f16523",
+          "light": "#f16523",
+          "highContrast": "#f16523",
+          "highContrastLight": "#f16523"
+        }
+      },
+      {
+        "id": "nagini.contracts.wrapper",
+        "description": "Syntax highlighting for annotations from contracts.py.",
+        "defaults": {
+          "dark": "#f16523",
+          "light": "#f16523",
+          "highContrast": "#f16523",
+          "highContrastLight": "#f16523"
+        }
+      },
+      {
+        "id": "nagini.contracts.quantifier",
+        "description": "Syntax highlighting for annotations from contracts.py.",
+        "defaults": {
+          "dark": "#f16523",
+          "light": "#f16523",
+          "highContrast": "#f16523",
+          "highContrastLight": "#f16523"
+        }
+      },
+      {
+        "id": "nagini.contracts.predicate",
+        "description": "Syntax highlighting for annotations from contracts.py.",
+        "defaults": {
+          "dark": "#f16523",
+          "light": "#f16523",
+          "highContrast": "#f16523",
+          "highContrastLight": "#f16523"
+        }
+      },
+      {
+        "id": "nagini.contracts.decorator",
+        "description": "Syntax highlighting for annotations from contracts.py.",
+        "defaults": {
+          "dark": "#39FF14",
+          "light": "#39FF14",
+          "highContrast": "#39FF14",
+          "highContrastLight": "#39FF14"
+        }
+      },
+      {
+        "id": "nagini.contracts.function",
+        "description": "Syntax highlighting for annotations from contracts.py.",
+        "defaults": {
+          "dark": "#f16523",
+          "light": "#f16523",
+          "highContrast": "#f16523",
+          "highContrastLight": "#f16523"
+        }
+      },
+      {
+        "id": "nagini.io_builtins",
+        "description": "Syntax highlighting for annotations from io-builtins.py.",
+        "defaults": {
+          "dark": "#f16523",
+          "light": "#f16523",
+          "highContrast": "#f16523",
+          "highContrastLight": "#f16523"
+        }
+      },
+      {
+        "id": "nagini.io_contracts",
+        "description": "Syntax highlighting for annotations from io-contracts.py.",
+        "defaults": {
+          "dark": "#f16523",
+          "light": "#f16523",
+          "highContrast": "#f16523",
+          "highContrastLight": "#f16523"
+        }
+      },
+      {
+        "id": "nagini.io_contracts.decorator",
+        "description": "Syntax highlighting for annotations from io-contracts.py.",
+        "defaults": {
+          "dark": "#39FF14",
+          "light": "#39FF14",
+          "highContrast": "#39FF14",
+          "highContrastLight": "#39FF14"
+        }
+      },
+      {
+        "id": "nagini.lock",
+        "description": "Syntax highlighting for annotations from lock.py.",
+        "defaults": {
+          "dark": "#f16523",
+          "light": "#f16523",
+          "highContrast": "#f16523",
+          "highContrastLight": "#f16523"
+        }
+      },
+      {
+        "id": "nagini.obligations",
+        "description": "Syntax highlighting for annotations from obligations.py.",
+        "defaults": {
+          "dark": "#f16523",
+          "light": "#f16523",
+          "highContrast": "#f16523",
+          "highContrastLight": "#f16523"
+        }
+      },
+      {
+        "id": "nagini.thread",
+        "description": "Syntax highlighting for annotations from thread.py.",
+        "defaults": {
+          "dark": "#f16523",
+          "light": "#f16523",
+          "highContrast": "#f16523",
+          "highContrastLight": "#f16523"
+        }
+      }
+    ]
+  },
+  "extensionDependencies": [
+    "ms-python.python"
+  ],
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "dependencies": {
+    "@vscode/python-extension":"^1.0.6"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.111.0",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.39.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1"
+  }
+}

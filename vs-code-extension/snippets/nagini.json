@@ -1,0 +1,815 @@
+{
+    "ADT": {
+        "prefix": "ADT",
+        "body": [
+            "ADT"
+        ],
+        "description": "ADT"
+    },
+    "Requires": {
+        "prefix": "Requires",
+        "body": [
+            "Requires(${1:expr: bool})"
+        ],
+        "description": "Contract Precondition"
+    },
+    "Ensures1": {
+        "prefix": "Ensures",
+        "body": [
+            "Ensures(${1:expr: bool})"
+        ],
+        "description": "Contract Postcondition"
+    },
+    "Ensures2": {
+        "prefix": "Ensures",
+        "body": [
+            "Ensures(${1:type: Type[T]}, ${2:callable: Callable[[T], bool]})"
+        ],
+        "description": "Contract Postcondition"
+    },
+    "Exsures": {
+        "prefix": "Exsures",
+        "body": [
+            "Exsures(${1:exception: type}, ${2:expr: bool})"
+        ],
+        "description": "Contract Postcondition"
+    },
+    "Invariant": {
+        "prefix": "Invariant",
+        "body": [
+            "Invariant(${1:expr: bool})"
+        ],
+        "description": "Contract Invariant"
+    },
+    "Decreases": {
+        "prefix": "Decreases",
+        "body": [
+            "Decreases(${1:expr: Optional[int]})"
+        ],
+        "description": "Contract Termination"
+    },
+    "Exists": {
+        "prefix": "Exists",
+        "body": [
+            "Exists(${1:dom}, ${2:pred})"
+        ],
+        "description": "Contract Quantifier"
+    },
+    "Forall": {
+        "prefix": "Forall",
+        "body": [
+            "Forall(${1:dom}, ${2:pred})"
+        ],
+        "description": "Contract Quantifier"
+    },
+    "Forall2": {
+        "prefix": "Forall2",
+        "body": [
+            "Forall2(${1:dom}, ${2:dom}, ${3:pred})"
+        ],
+        "description": "Contract Quantifier"
+    },
+    "Forall3": {
+        "prefix": "Forall3",
+        "body": [
+            "Forall3(${1:dom}, ${2:dom}, ${3:dom}, ${4:pred})"
+        ],
+        "description": "Contract Quantifier"
+    },
+    "Forall4": {
+        "prefix": "Forall4",
+        "body": [
+            "Forall4(${1:dom}, ${2:dom}, ${3:dom}, ${4:dom}, ${5:pred})"
+        ],
+        "description": "Contract Quantifier"
+    },
+    "Forall5": {
+        "prefix": "Forall5",
+        "body": [
+            "Forall5(${1:dom}, ${2:dom}, ${3:dom}, ${4:dom}, ${5:dom}, ${6:pred})"
+        ],
+        "description": "Contract Quantifier"
+    },
+    "Forall6": {
+        "prefix": "Forall6",
+        "body": [
+            "Forall6(${1:dom}, ${2:dom}, ${3:dom}, ${4:dom}, ${5:dom}, ${6:dom}, ${7:pred})"
+        ],
+        "description": "Contract Quantifier"
+    },
+    "bytearray_pred": {
+        "prefix": "bytearray_pred",
+        "body": [
+            "bytearray_pred(${1:bytearray: object})"
+        ],
+        "description": "Contract Predicate"
+    },
+    "dict_pred": {
+        "prefix": "dict_pred",
+        "body": [
+            "dict_pred(${1:dictionary: object})"
+        ],
+        "description": "Contract Predicate"
+    },
+    "list_pred": {
+        "prefix": "list_pred",
+        "body": [
+            "list_pred(${1:list: object})"
+        ],
+        "description": "Contract Predicate"
+    },
+    "set_pred": {
+        "prefix": "set_pred",
+        "body": [
+            "set_pred(${1:set: object})"
+        ],
+        "description": "Contract Predicate"
+    },
+    "AllLow": {
+        "prefix": "@AllLow",
+        "body": [
+            "@AllLow"
+        ],
+        "description": "Contract Decorator"
+    },
+    "ContractOnly": {
+        "prefix": "@ContractOnly",
+        "body": [
+            "@ContractOnly"
+        ],
+        "description": "Contract Decorator"
+    },
+    "Ghost": {
+        "prefix": "@Ghost",
+        "body": [
+            "@Ghost"
+        ],
+        "description": "Contract Decorator"
+    },
+    "GhostReturns": {
+        "prefix": "@GhostReturns",
+        "body": [
+            "@GhostReturns(${1:index: int})"
+        ],
+        "description": "Contract Decorator"
+    },
+    "Inline": {
+        "prefix": "@Inline",
+        "body": [
+            "@Inline"
+        ],
+        "description": "Contract Decorator"
+    },
+    "Opaque": {
+        "prefix": "@Opaque",
+        "body": [
+            "@Opaque"
+        ],
+        "description": "Contract Decorator"
+    },
+    "Predicate": {
+        "prefix": "@Predicate",
+        "body": [
+            "@Predicate"
+        ],
+        "description": "Contract Decorator"
+    },
+    "PreservesLow": {
+        "prefix": "@PreservesLow",
+        "body": [
+            "@PreservesLow"
+        ],
+        "description": "Contract Decorator"
+    },
+    "Pure": {
+        "prefix": "@Pure",
+        "body": [
+            "@Pure"
+        ],
+        "description": "Contract Decorator"
+    },
+    "Acc": {
+        "prefix": "Acc",
+        "body": [
+            "Acc(${1:field})"
+        ],
+        "description": "Contract Function"
+    },
+    "ARP": {
+        "prefix": "ARP",
+        "body": [
+            "ARP()"
+        ],
+        "description": "Contract Function"
+    },
+    "Assume": {
+        "prefix": "Assume",
+        "body": [
+            "Assume(${1:expr: bool})"
+        ],
+        "description": "Contract Function"
+    },
+    "Assert": {
+        "prefix": "Assert",
+        "body": [
+            "Assert(${1:expr: bool})"
+        ],
+        "description": "Contract Function"
+    },
+    "Declassify": {
+        "prefix": "Declassify",
+        "body": [
+            "Declassify(${1:expr: T})"
+        ],
+        "description": "Contract Function"
+    },
+    "Fold": {
+        "prefix": "Fold",
+        "body": [
+            "Fold(${1:pred: bool})"
+        ],
+        "description": "Contract Function"
+    },
+    "Implies": {
+        "prefix": "Implies",
+        "body": [
+            "Implies(${1:expr: bool}, ${2:expr: bool})"
+        ],
+        "description": "Contract Function"
+    },
+    "isNaN": {
+        "prefix": "isNaN",
+        "body": [
+            "isNaN(${1:expr: float})"
+        ],
+        "description": "Contract Function"
+    },
+    "Let": {
+        "prefix": "Let",
+        "body": [
+            "Let(${1:expr: T}, ${2:type: Type[V]}, ${3:callable: Callable[[T], V]})"
+        ],
+        "description": "Contract Function"
+    },
+    "Low": {
+        "prefix": "Low",
+        "body": [
+            "Low(${1:expr: T})"
+        ],
+        "description": "Contract Function"
+    },
+    "LowEvent": {
+        "prefix": "LowEvent",
+        "body": [
+            "LowEvent()"
+        ],
+        "description": "Contract Function"
+    },
+    "LowExit": {
+        "prefix": "LowExit",
+        "body": [
+            "LowExit()"
+        ],
+        "description": "Contract Function"
+    },
+    "LowVal": {
+        "prefix": "LowVal",
+        "body": [
+            "LowVal(${1:expr: T})"
+        ],
+        "description": "Contract Function"
+    },
+    "MayCreate": {
+        "prefix": "MayCreate",
+        "body": [
+            "MayCreate(${1:obj: object}, ${2:field: str})"
+        ],
+        "description": "Contract Function"
+    },
+    "MaySet": {
+        "prefix": "MaySet",
+        "body": [
+            "MaySet(${1:obj: object}, ${2:field: str})"
+        ],
+        "description": "Contract Function"
+    },
+    "Old": {
+        "prefix": "Old",
+        "body": [
+            "Old(${1:expr: T})"
+        ],
+        "description": "Contract Function"
+    },
+    "PByteSeq": {
+        "prefix": "PByteSeq",
+        "body": [
+            "PByteSeq"
+        ],
+        "description": "Contract Class"
+    },
+    "PMultiset": {
+        "prefix": "PMultiset",
+        "body": [
+            "PMultiset"
+        ],
+        "description": "Contract Class"
+    },
+    "Previous": {
+        "prefix": "Previous",
+        "body": [
+            "Previous(${1:iterator: T})"
+        ],
+        "description": "Contract Function"
+    },
+    "PSet": {
+        "prefix": "PSet",
+        "body": [
+            "PSet"
+        ],
+        "description": "Contract Class"
+    },
+    "PSeq": {
+        "prefix": "PSeq",
+        "body": [
+            "PSeq"
+        ],
+        "description": "Contract Class"
+    },
+    "RaisedException": {
+        "prefix": "RaisedException",
+        "body": [
+            "RaisedException()"
+        ],
+        "description": "Contract Function"
+    },
+    "Rd": {
+        "prefix": "Rd",
+        "body": [
+            "Rd(${1:field})"
+        ],
+        "description": "Contract Function"
+    },
+    "RD_PRED": {
+        "prefix": "RD_PRED",
+        "body": [
+            "RD_PRED"
+        ],
+        "description": "Contract Constant"
+    },
+    "Refute": {
+        "prefix": "Refute",
+        "body": [
+            "Refute(${1:expr: bool})"
+        ],
+        "description": "Contract Function"
+    },
+    "Result": {
+        "prefix": "Result",
+        "body": [
+            "Result()"
+        ],
+        "description": "Contract Function"
+    },
+    "ResultT": {
+        "prefix": "ResultT",
+        "body": [
+            "ResultT(${1:type: Type[V]})"
+        ],
+        "description": "Contract Function"
+    },
+    "Reveal": {
+        "prefix": "Reveal",
+        "body": [
+            "Reveal(${1:function_application: T})"
+        ],
+        "description": "Contract Function"
+    },
+    "TerminatesSif": {
+        "prefix": "TerminatesSif",
+        "body": [
+            "TerminatesSif(${1:cond: bool}, ${2:rank: int})"
+        ],
+        "description": "Contract Function"
+    },
+    "ToByteSeq": {
+        "prefix": "ToByteSeq",
+        "body": [
+            "ToByteSeq(${1:iterable: Iterable[int]})"
+        ],
+        "description": "Contract Function"
+    },
+    "ToMS": {
+        "prefix": "ToMS",
+        "body": [
+            "ToMS(${1:sequence: PSeq[T]})"
+        ],
+        "description": "Contract Function"
+    },
+    "ToSeq": {
+        "prefix": "ToSeq",
+        "body": [
+            "ToSeq(${1:iterable: Iterable[T]})"
+        ],
+        "description": "Contract Function"
+    },
+    "Unfold": {
+        "prefix": "Unfold",
+        "body": [
+            "Unfold(${1:pred: bool})"
+        ],
+        "description": "Contract Function"
+    },
+    "Unfolding": {
+        "prefix": "Unfolding",
+        "body": [
+            "Unfolding(${1:pred: bool}, ${2:expr: T})"
+        ],
+        "description": "Contract Function"
+    },
+    "Wildcard": {
+        "prefix": "Wildcard",
+        "body": [
+            "Wildcard(${1:field})"
+        ],
+        "description": "Contract Function"
+    },
+    "End": {
+        "prefix": "End",
+        "body": [
+            "End(${1:place: Place})"
+        ],
+        "description": "IO Builtin"
+    },
+    "Eval": {
+        "prefix": "Eval",
+        "body": [
+            "Eval(${1:place: Place}, ${2:callable: Callable[[T], V]}, ${3:expr: T})"
+        ],
+        "description": "IO Builtin"
+    },
+    "Gap": {
+        "prefix": "Gap",
+        "body": [
+            "Gap(${1:place: Place})"
+        ],
+        "description": "IO Builtin"
+    },
+    "Join": {
+        "prefix": "Join",
+        "body": [
+            "Join(${1:place: Place}, ${2:place: Place})"
+        ],
+        "description": "IO Builtin"
+    },
+    "NoOp": {
+        "prefix": "NoOp",
+        "body": [
+            "NoOp(${1:place: Place})"
+        ],
+        "description": "IO Builtin"
+    },
+    "SetVar": {
+        "prefix": "SetVar",
+        "body": [
+            "SetVar(${1:place: Place}, ${2:expr: int})"
+        ],
+        "description": "IO Builtin"
+    },
+    "Split": {
+        "prefix": "Split",
+        "body": [
+            "Split(${1:place: Place})"
+        ],
+        "description": "IO Builtin"
+    },
+    "end_io": {
+        "prefix": "end_io",
+        "body": [
+            "end_io(${1:place: Place})"
+        ],
+        "description": "IO Builtin"
+    },
+    "eval_io": {
+        "prefix": "eval_io",
+        "body": [
+            "eval_io(${1:place: Place}, ${2:callable: Callable[[T], V]}, ${3:expr: T})"
+        ],
+        "description": "IO Builtin"
+    },
+    "gap_io": {
+        "prefix": "gap_io",
+        "body": [
+            "gap_io(${1:place: Place})"
+        ],
+        "description": "IO Builtin"
+    },
+    "join_io": {
+        "prefix": "join_io",
+        "body": [
+            "join_io(${1:place: Place}, ${2:place: Place})"
+        ],
+        "description": "IO Builtin"
+    },
+    "no_op_io": {
+        "prefix": "no_op_io",
+        "body": [
+            "no_op_io(${1:place: Place})"
+        ],
+        "description": "IO Builtin"
+    },
+    "set_var_io": {
+        "prefix": "set_var_io",
+        "body": [
+            "set_var_io(${1:place: Place}, ${2:expr: int})"
+        ],
+        "description": "IO Builtin"
+    },
+    "split_io": {
+        "prefix": "split_io",
+        "body": [
+            "split_io(${1:place: Place})"
+        ],
+        "description": "IO Builtin"
+    },
+    "GetGhostOutput": {
+        "prefix": "GetGhostOutput",
+        "body": [
+            "GetGhostOutput(${1:op: bool}, ${2:var :str})"
+        ],
+        "description": "IO Contract"
+    },
+    "IOExists": {
+        "prefix": "IOExists",
+        "body": [
+            "IOExists(${1:dom: Type[T]})"
+        ],
+        "description": "IO Contract"
+    },
+    "IOExists1": {
+        "prefix": "IOExists1",
+        "body": [
+            "IOExists1"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists2": {
+        "prefix": "IOExists2",
+        "body": [
+            "IOExists2"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists3": {
+        "prefix": "IOExists3",
+        "body": [
+            "IOExists3"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists4": {
+        "prefix": "IOExists4",
+        "body": [
+            "IOExists4"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists5": {
+        "prefix": "IOExists5",
+        "body": [
+            "IOExists5"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists6": {
+        "prefix": "IOExists6",
+        "body": [
+            "IOExists6"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists7": {
+        "prefix": "IOExists7",
+        "body": [
+            "IOExists7"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists8": {
+        "prefix": "IOExists8",
+        "body": [
+            "IOExists8"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists9": {
+        "prefix": "IOExists9",
+        "body": [
+            "IOExists9"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists10": {
+        "prefix": "IOExists10",
+        "body": [
+            "IOExists10"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists11": {
+        "prefix": "IOExists11",
+        "body": [
+            "IOExists11"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists12": {
+        "prefix": "IOExists12",
+        "body": [
+            "IOExists12"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists13": {
+        "prefix": "IOExists13",
+        "body": [
+            "IOExists13"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists14": {
+        "prefix": "IOExists14",
+        "body": [
+            "IOExists14"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOExists15": {
+        "prefix": "IOExists15",
+        "body": [
+            "IOExists15"
+        ],
+        "description": "IO Contract Class"
+    },
+    "IOForall": {
+        "prefix": "IOForall",
+        "body": [
+            "IOForall(${1:dom: Type[T]}, ${2:pred: Callable[[T], Union[bool, Tuple[bool, List[List[Any]]]]]})"
+        ],
+        "description": "IO Contract"
+    },
+    "Open": {
+        "prefix": "Open",
+        "body": [
+            "Open(${1:op: bool})"
+        ],
+        "description": "IO Contract"
+    },
+    "Place": {
+        "prefix": "Place",
+        "body": [
+            "Place"
+        ],
+        "description": "IO Contract Class"
+    },
+    "Terminates": {
+        "prefix": "Terminates",
+        "body": [
+            "Terminates(${1:expr: bool})"
+        ],
+        "description": "IO Contract"
+    },
+    "TerminationMeasure": {
+        "prefix": "TerminationMeasure",
+        "body": [
+            "TerminationMeasure(${1:expr: int})"
+        ],
+        "description": "IO Contract"
+    },
+    "ctoken": {
+        "prefix": "ctoken",
+        "body": [
+            "ctoken(${1:place: Place})"
+        ],
+        "description": "IO Contract"
+    },
+    "token": {
+        "prefix": "token",
+        "body": [
+            "token(${1:place: Place})"
+        ],
+        "description": "IO Contract"
+    },
+    "IOOperation": {
+        "prefix": "@IOOperation",
+        "body": [
+            "@IOOperation"
+        ],
+        "description": "IO Contract Decorator"
+    },
+    "Lock": {
+        "prefix": "Lock",
+        "body": [
+            "Lock(${1:expr: T})"
+        ],
+        "description": "Lock"
+    },
+    "Level": {
+        "prefix": "Level",
+        "body": [
+            "Level(${1:level: Union[BaseLock, Thread]})"
+        ],
+        "description": "Obligation"
+    },
+    "LevelType": {
+        "prefix": "LevelType",
+        "body": [
+            "LevelType(${1:other: 'LevelType'})"
+        ],
+        "description": "Obligation Class"
+    },
+    "MustRelease": {
+        "prefix": "MustRelease",
+        "body": [
+            "MustRelease(${1:lock: BaseLock})"
+        ],
+        "description": "Obligation"
+    },
+    "MustTerminate": {
+        "prefix": "MustTerminate",
+        "body": [
+            "MustTerminate(${1:expr: int})"
+        ],
+        "description": "Obligation"
+    },
+    "WaitLevel": {
+        "prefix": "WaitLevel",
+        "body": [
+            "WaitLevel()"
+        ],
+        "description": "Obligation"
+    },
+    "Joinable": {
+        "prefix": "Joinable",
+        "body": [
+            "Joinable(${1:thread: Thread})"
+        ],
+        "description": "Thread"
+    },
+    "MayStart": {
+        "prefix": "MayStart",
+        "body": [
+            "MayStart(${1:thread: Thread})"
+        ],
+        "description": "Thread"
+    },
+    "Thread": {
+        "prefix": "Thread",
+        "body": [
+            "Thread"
+        ],
+        "description": "Thread Class"
+    },
+    "ThreadPost": {
+        "prefix": "ThreadPost",
+        "body": [
+            "ThreadPost(${1:thread: Thread})"
+        ],
+        "description": "Thread"
+    },
+    "arg": {
+        "prefix": "arg",
+        "body": [
+            "arg(${1:expr: int})"
+        ],
+        "description": "Thread"
+    },
+    "getARP": {
+        "prefix": "getARP",
+        "body": [
+            "getARP(${1:thread: Thread})"
+        ],
+        "description": "Thread"
+    },
+    "getArg": {
+        "prefix": "getArg",
+        "body": [
+            "getArg(${1:thread: Thread}, ${2:expr: int})"
+        ],
+        "description": "Thread"
+    },
+    "getMethod": {
+        "prefix": "getMethod",
+        "body": [
+            "getMethod(${1:thread: Thread})"
+        ],
+        "description": "Thread"
+    },
+    "getOld": {
+        "prefix": "getOld",
+        "body": [
+            "getOld(${1:thread: Thread}, ${2:obj: object})"
+        ],
+        "description": "Thread"
+    }
+
+}

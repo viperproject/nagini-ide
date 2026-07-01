@@ -1,0 +1,4 @@
+[submodule "vs-code-extension/nagini"]
+	path = vs-code-extension/nagini
+	url = https://github.com/marcoeilers/nagini
+	branch = master
