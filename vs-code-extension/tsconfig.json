@@ -4,7 +4,8 @@
 		"target": "ES2022",
 		"outDir": "out",
 		"types": [
-			"node"
+			"node",
+			"mocha"
 		],
 		"lib": [
 			"ES2022",

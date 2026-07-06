@@ -1,3 +1,4 @@
 .vscode/settings.json
 vs-code-extension/node_modules
 vs-code-extension/out
+vs-code-extension/.vscode-test
