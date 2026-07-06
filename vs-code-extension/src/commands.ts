@@ -255,7 +255,27 @@ export async function startVerification(verificationState: VerificationState): P
 
         logOutputChannel.info('Verification starting...');
 
-        const settings: { boogieExecutablePath: string | undefined; verificationTimeout: number | undefined; } = getSettings();
+        const settings: { boogieExecutablePath: string | undefined; verificationTimeout: number | undefined; additionalArguments: string[]; } = getSettings();
+
+        if (verificationState.activeBackend === 'carbon' && !settings.boogieExecutablePath?.trim()) {
+            logOutputChannel.info('Verification cancelled. Reason: the VCG (Carbon) backend requires a Boogie executable, but none is configured');
+            updateStatusItem('$(x) Nagini needs a Boogie path for VCG', 'error');
+            const openSettings: string = 'Open Settings';
+            const selectBackend: string = 'Select Backend';
+            const selection: string | undefined = await vscode.window.showErrorMessage(
+                'The VCG (Carbon) backend requires a Boogie executable, but none is configured. Set the "nagini.paths.boogieExecutable" setting, or switch to the SE (Silicon) backend.',
+                openSettings,
+                selectBackend
+            );
+            if (selection === openSettings) {
+                vscode.commands.executeCommand('workbench.action.openSettings', 'nagini.paths.boogieExecutable');
+            } else if (selection === selectBackend) {
+                vscode.commands.executeCommand('nagini.selectBackend');
+            }
+            logOutputChannel.info('Verification finished');
+            return;
+        }
+
         const uri: vscode.Uri = activeEditor.document.uri;
         const file: string = uri.fsPath;
         const fileName: string = path.basename(file);
@@ -316,16 +336,16 @@ export async function startVerification(verificationState: VerificationState): P
             } else if (session.interrupted) {
                 logOutputChannel.info(`Verification process ${session.process.pid} for ${fileName} finished. Result: Interruption`);
                 updateStatusItem('Nagini was interrupted', 'idle');
-            } else if (session.stdout.startsWith('Translation failed')) {
+            } else if (stdoutHasResultLine(session.stdout, 'Translation failed')) {
                 logOutputChannel.info(`Verification process ${session.process.pid} for ${fileName} finished. Result: Translation failed\nstdout:\n${session.stdout}\nstderr:\n${session.stderr}`);
                 updateStatusItem(`$(x) Nagini failed to translate ${fileName}`, 'failure');
-            } else if (session.stdout.startsWith('Verification failed')) {
+            } else if (stdoutHasResultLine(session.stdout, 'Verification failed')) {
                 const duration: number = parseDurationFromOutput(session.stdout);
                 const diagnostics: vscode.Diagnostic[] = parseErrorsFromOutput(fileName, session.stdout, 'Nagini');
                 diagnosticCollection.set(uri, diagnostics);
                 logOutputChannel.info(`Verification process ${session.process.pid} for ${fileName} finished. Result: Verification failed\nstdout:\n${session.stdout}\nstderr:\n${session.stderr}`);
                 updateStatusItem(`$(x) Nagini failed to verify ${fileName} (${duration}s) with ${diagnostics.length} ${diagnostics.length === 1 ? 'error' : 'errors'}`, 'failure');
-            } else if (session.stdout.startsWith('Verification successful')) {
+            } else if (stdoutHasResultLine(session.stdout, 'Verification successful')) {
                 const duration: number = parseDurationFromOutput(session.stdout);
                 logOutputChannel.info(`Verification process ${session.process.pid} for ${fileName} finished. Result: Success\nstdout:\n${session.stdout}\nstderr:\n${session.stderr}`);
                 updateStatusItem(`$(check) Nagini verified ${fileName} (${duration}s)`, 'success');
@@ -358,6 +378,15 @@ export async function stopVerification(verificationState: VerificationState): Pr
 function finalizeVerificationSession(verificationState: VerificationState, session: VerificationSession): void {
     verificationState.activeVerificationSession = undefined;
     session.resolveTermination();
+}
+
+// Nagini prints its result marker ('Translation failed', 'Verification failed',
+// 'Verification successful') on its own line, but flags such as --verbose,
+// --print-viper or --benchmark emit additional output before it. Scan every line for
+// the marker instead of only checking the start of stdout, so those flags don't cause
+// a run to be misreported as a timeout.
+function stdoutHasResultLine(stdout: string, marker: string): boolean {
+    return stdout.split('\n').some((line: string) => line.startsWith(marker));
 }
 
 async function showErrorMessageWithAction(context: string): Promise<void> {

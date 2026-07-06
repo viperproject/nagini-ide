@@ -7,9 +7,10 @@
 
 import * as vscode from 'vscode';
 
-export function getSettings(): { boogieExecutablePath: string | undefined; verificationTimeout: number | undefined } {
+export function getSettings(): { boogieExecutablePath: string | undefined; verificationTimeout: number | undefined; additionalArguments: string[] } {
     let boogieExecutablePath: string | undefined = vscode.workspace.getConfiguration('nagini').get<string>('paths.boogieExecutable');
     let verificationTimeout: number | undefined = vscode.workspace.getConfiguration('nagini').get<number>('verification.timeout');
+    const additionalArguments: string[] = vscode.workspace.getConfiguration('nagini').get<string[]>('verification.additionalArguments') ?? [];
     if (verificationTimeout === undefined) {
         verificationTimeout = 60000;
     } else if (verificationTimeout === 0) {
@@ -17,5 +18,5 @@ export function getSettings(): { boogieExecutablePath: string | undefined; verif
     } else {
         verificationTimeout *= 1000;
     }
-    return { boogieExecutablePath, verificationTimeout };
+    return { boogieExecutablePath, verificationTimeout, additionalArguments };
 }

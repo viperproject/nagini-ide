@@ -129,6 +129,14 @@
           "default": 60,
           "minimum": 0,
           "description": "Maximum verification duration in seconds before the operation is cancelled. Set to 0 for no timeout."
+        },
+        "nagini.verification.additionalArguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Additional command-line arguments passed to Nagini during verification (e.g. [\"--counterexample\", \"--sif\"]). Each item is one argument token. In Server mode, changing this restarts the Nagini server."
         }
       }
     },
@@ -143,120 +151,120 @@
         "id": "nagini.adt",
         "description": "Syntax highlighting for annotations from adt.py.",
         "defaults": {
-          "dark": "#f16523",
-          "light": "#f16523",
-          "highContrast": "#f16523",
-          "highContrastLight": "#f16523"
+          "dark": "#8892cc",
+          "light": "#3e4b78",
+          "highContrast": "#8892cc",
+          "highContrastLight": "#3e4b78"
         }
       },
       {
         "id": "nagini.contracts.wrapper",
         "description": "Syntax highlighting for annotations from contracts.py.",
         "defaults": {
-          "dark": "#f16523",
-          "light": "#f16523",
-          "highContrast": "#f16523",
-          "highContrastLight": "#f16523"
+          "dark": "#e8965a",
+          "light": "#c86f2c",
+          "highContrast": "#e8965a",
+          "highContrastLight": "#c86f2c"
         }
       },
       {
         "id": "nagini.contracts.quantifier",
         "description": "Syntax highlighting for annotations from contracts.py.",
         "defaults": {
-          "dark": "#f16523",
-          "light": "#f16523",
-          "highContrast": "#f16523",
-          "highContrastLight": "#f16523"
+          "dark": "#8892cc",
+          "light": "#3e4b78",
+          "highContrast": "#8892cc",
+          "highContrastLight": "#3e4b78"
         }
       },
       {
         "id": "nagini.contracts.predicate",
         "description": "Syntax highlighting for annotations from contracts.py.",
         "defaults": {
-          "dark": "#f16523",
-          "light": "#f16523",
-          "highContrast": "#f16523",
-          "highContrastLight": "#f16523"
+          "dark": "#8892cc",
+          "light": "#3e4b78",
+          "highContrast": "#8892cc",
+          "highContrastLight": "#3e4b78"
         }
       },
       {
         "id": "nagini.contracts.decorator",
         "description": "Syntax highlighting for annotations from contracts.py.",
         "defaults": {
-          "dark": "#39FF14",
-          "light": "#39FF14",
-          "highContrast": "#39FF14",
-          "highContrastLight": "#39FF14"
+          "dark": "#98c379",
+          "light": "#4e9a3d",
+          "highContrast": "#98c379",
+          "highContrastLight": "#4e9a3d"
         }
       },
       {
         "id": "nagini.contracts.function",
         "description": "Syntax highlighting for annotations from contracts.py.",
         "defaults": {
-          "dark": "#f16523",
-          "light": "#f16523",
-          "highContrast": "#f16523",
-          "highContrastLight": "#f16523"
+          "dark": "#8892cc",
+          "light": "#3e4b78",
+          "highContrast": "#8892cc",
+          "highContrastLight": "#3e4b78"
         }
       },
       {
         "id": "nagini.io_builtins",
         "description": "Syntax highlighting for annotations from io-builtins.py.",
         "defaults": {
-          "dark": "#f16523",
-          "light": "#f16523",
-          "highContrast": "#f16523",
-          "highContrastLight": "#f16523"
+          "dark": "#8892cc",
+          "light": "#3e4b78",
+          "highContrast": "#8892cc",
+          "highContrastLight": "#3e4b78"
         }
       },
       {
         "id": "nagini.io_contracts",
         "description": "Syntax highlighting for annotations from io-contracts.py.",
         "defaults": {
-          "dark": "#f16523",
-          "light": "#f16523",
-          "highContrast": "#f16523",
-          "highContrastLight": "#f16523"
+          "dark": "#8892cc",
+          "light": "#3e4b78",
+          "highContrast": "#8892cc",
+          "highContrastLight": "#3e4b78"
         }
       },
       {
         "id": "nagini.io_contracts.decorator",
         "description": "Syntax highlighting for annotations from io-contracts.py.",
         "defaults": {
-          "dark": "#39FF14",
-          "light": "#39FF14",
-          "highContrast": "#39FF14",
-          "highContrastLight": "#39FF14"
+          "dark": "#98c379",
+          "light": "#4e9a3d",
+          "highContrast": "#98c379",
+          "highContrastLight": "#4e9a3d"
         }
       },
       {
         "id": "nagini.lock",
         "description": "Syntax highlighting for annotations from lock.py.",
         "defaults": {
-          "dark": "#f16523",
-          "light": "#f16523",
-          "highContrast": "#f16523",
-          "highContrastLight": "#f16523"
+          "dark": "#8892cc",
+          "light": "#3e4b78",
+          "highContrast": "#8892cc",
+          "highContrastLight": "#3e4b78"
         }
       },
       {
         "id": "nagini.obligations",
         "description": "Syntax highlighting for annotations from obligations.py.",
         "defaults": {
-          "dark": "#f16523",
-          "light": "#f16523",
-          "highContrast": "#f16523",
-          "highContrastLight": "#f16523"
+          "dark": "#8892cc",
+          "light": "#3e4b78",
+          "highContrast": "#8892cc",
+          "highContrastLight": "#3e4b78"
         }
       },
       {
         "id": "nagini.thread",
         "description": "Syntax highlighting for annotations from thread.py.",
         "defaults": {
-          "dark": "#f16523",
-          "light": "#f16523",
-          "highContrast": "#f16523",
-          "highContrastLight": "#f16523"
+          "dark": "#8892cc",
+          "light": "#3e4b78",
+          "highContrast": "#8892cc",
+          "highContrastLight": "#3e4b78"
         }
       }
     ]

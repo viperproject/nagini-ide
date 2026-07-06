@@ -30,25 +30,26 @@ export interface VerificationSession {
 }
 
 export function initializeState(): VerificationState {
-    const serverMode: boolean = false;
+    const serverMode: boolean = true;
     const activeBackend: Backend = 'silicon';
     const server: Server = new Server();
     const activeVerificationSession: VerificationSession | undefined = undefined;
     return { serverMode, activeBackend, server, activeVerificationSession };
 }
 
-export function getNaginiCommandArgs(verificationState: VerificationState, fileName: string, settings: { boogieExecutablePath: string | undefined }): string[] {
+export function getNaginiCommandArgs(verificationState: VerificationState, fileName: string, settings: { boogieExecutablePath: string | undefined; additionalArguments: string[] }): string[] {
     const backend: Backend = verificationState.activeBackend;
     const boogiePath: string | undefined = settings.boogieExecutablePath;
     return [
         '--ide-mode',
         '--verifier', backend,
         ...(backend === 'carbon' && boogiePath ? ['--boogie', boogiePath] : []),
+        ...settings.additionalArguments,
         fileName
     ];
 }
 
-export function getNaginiServerCommandArgs(verificationState: VerificationState, settings: { boogieExecutablePath: string | undefined }): string[] {
+export function getNaginiServerCommandArgs(verificationState: VerificationState, settings: { boogieExecutablePath: string | undefined; additionalArguments: string[] }): string[] {
     const backend: Backend = verificationState.activeBackend;
     const boogiePath: string | undefined = settings.boogieExecutablePath;
     return [
@@ -56,6 +57,7 @@ export function getNaginiServerCommandArgs(verificationState: VerificationState,
         '--ide-mode',
         '--verifier', backend,
         ...(backend === 'carbon' && boogiePath ? ['--boogie', boogiePath] : []),
+        ...settings.additionalArguments,
         'nonexistent.py'
     ];
 }
