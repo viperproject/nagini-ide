@@ -29,10 +29,11 @@ This extension provides the following settings:
 
 - `nagini.paths.boogieExecutable`: specify the path of the Boogie executable used by Carbon
 - `nagini.verification.timeout`: specify the time limit for a verification process
+- `nagini.verification.additionalArguments`: specify additional command-line arguments passed to Nagini during verification (each list item is one argument)
 
 ## Troubleshooting
 
 ### Orphaned server process
 
-Nagini's server process may continue running after the extension is deactivated 
-or VS Code is closed. If this happens, it needs to be terminated manually.
+Occasionally, Nagini's server process may continue running after the extension is deactivated or VS Code is closed. 
+If this happens, it needs to be terminated manually.
