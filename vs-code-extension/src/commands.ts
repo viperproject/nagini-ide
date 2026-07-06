@@ -337,8 +337,10 @@ export async function startVerification(verificationState: VerificationState): P
                 logOutputChannel.info(`Verification process ${session.process.pid} for ${fileName} finished. Result: Interruption`);
                 updateStatusItem('Nagini was interrupted', 'idle');
             } else if (stdoutHasResultLine(session.stdout, 'Translation failed')) {
+                const diagnostics: vscode.Diagnostic[] = parseErrorsFromOutput(fileName, session.stdout, 'Nagini');
+                diagnosticCollection.set(uri, diagnostics);
                 logOutputChannel.info(`Verification process ${session.process.pid} for ${fileName} finished. Result: Translation failed\nstdout:\n${session.stdout}\nstderr:\n${session.stderr}`);
-                updateStatusItem(`$(x) Nagini failed to translate ${fileName}`, 'failure');
+                updateStatusItem(`$(x) Nagini failed to translate ${fileName} with ${diagnostics.length} ${diagnostics.length === 1 ? 'error' : 'errors'}`, 'failure');
             } else if (stdoutHasResultLine(session.stdout, 'Verification failed')) {
                 const duration: number = parseDurationFromOutput(session.stdout);
                 const diagnostics: vscode.Diagnostic[] = parseErrorsFromOutput(fileName, session.stdout, 'Nagini');

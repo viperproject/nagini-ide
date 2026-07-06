@@ -68,17 +68,20 @@ export function parseDurationFromOutput(message: string): number {
 }
 
 export function parseErrorsFromOutput(fileName: string, message: string, source: string): vscode.Diagnostic[] {
-    const regExp: RegExp = createErrorRegEx(fileName);
+    // Nagini prefixes each error line with the file it reported the argument as, which may be
+    // a bare basename (verification errors) or a relative/absolute path (translation errors).
+    // Match any leading path and compare by basename so both forms are attributed to the file.
+    const regExp: RegExp = /^(.+):(\d+):(\d+):(\d+):(\d+): error: (.+)$/;
     const diagnostics: vscode.Diagnostic[] = [];
     const lines: string[] = message.split("\n");
     for (const line of lines) {
         const match: RegExpExecArray | null = regExp.exec(line);
-        if (match) {
-            const startLine: number = parseInt(match[1]);
-            const startCol: number = parseInt(match[2]);
-            const endLine: number = parseInt(match[3]);
-            const endCol: number = parseInt(match[4]);
-            const error: string = match[5];
+        if (match && path.basename(match[1]) === fileName) {
+            const startLine: number = parseInt(match[2]);
+            const startCol: number = parseInt(match[3]);
+            const endLine: number = parseInt(match[4]);
+            const endCol: number = parseInt(match[5]);
+            const error: string = match[6];
             const startPos: vscode.Position = new vscode.Position(startLine-1, startCol-1);
             const endPos: vscode.Position = new vscode.Position(endLine-1, endCol-1);
             const range: vscode.Range = new vscode.Range(startPos, endPos);
@@ -88,12 +91,4 @@ export function parseErrorsFromOutput(fileName: string, message: string, source:
         }
     }
     return diagnostics;
-}
-
-function createErrorRegEx(fileName: string): RegExp {
-    return new RegExp(`^${escapeRegEx(fileName)}:(\\d+):(\\d+):(\\d+):(\\d+): error: (.+)$`);
-}
-
-function escapeRegEx(str: string): string {
-    return str.replace(/[.*+?^$()[\]{}|\\]/g, "\\$&");
 }
