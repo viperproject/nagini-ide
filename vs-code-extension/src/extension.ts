@@ -52,9 +52,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             }
         }),
         vscode.workspace.onDidChangeConfiguration(async (event: vscode.ConfigurationChangeEvent) => {
-            if (event.affectsConfiguration('nagini.paths.boogieExecutable')) {
+            if (event.affectsConfiguration('nagini.paths.boogieExecutable') || event.affectsConfiguration('nagini.verification.additionalArguments')) {
                 if (_verificationState.serverMode) {
-                    logOutputChannel.info('Configuration change registered (nagini.paths.boogieExecutable). Stopping server...');
+                    logOutputChannel.info('Configuration change registered (Nagini command-line settings). Stopping server...');
                     await _verificationState.server.stop();
                 }
             }
@@ -76,6 +76,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         }),
         vscode.commands.registerCommand('nagini.startVerification', async () => {
             await commands.startVerification(_verificationState);
+        }),
+        vscode.commands.registerCommand('nagini.verifyFunction', async () => {
+            await commands.verifyFunction(_verificationState);
         }),
         vscode.commands.registerCommand('nagini.stopVerification', async () => {
             await commands.stopVerification(_verificationState);

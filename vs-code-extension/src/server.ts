@@ -35,7 +35,7 @@ export class Server {
     private async start(verificationState: VerificationState, naginiPath: string): Promise<void> {
         logOutputChannel.info('Server starting...');
 
-        const settings: { boogieExecutablePath: string | undefined; verificationTimeout: number | undefined; } = getSettings();
+        const settings: { boogieExecutablePath: string | undefined; verificationTimeout: number | undefined; additionalArguments: string[]; } = getSettings();
         const serverArgs: string[] = getNaginiServerCommandArgs(verificationState, settings);
 
         const session: ServerSession = (() => {

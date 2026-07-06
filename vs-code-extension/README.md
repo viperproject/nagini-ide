@@ -21,6 +21,7 @@ This extension provides the following commands:
 - `Nagini: Toggle Mode`: activate/deactivate server mode
 - `Nagini: Select Backend`: select the backend verifier
 - `Nagini: Start Verification`: start a new verification process
+- `Nagini: Verify Function at Cursor`: verify only the function or method at the cursor position
 - `Nagini: Stop Verification`: stop the current verification process
 
 ### Settings
@@ -29,10 +30,11 @@ This extension provides the following settings:
 
 - `nagini.paths.boogieExecutable`: specify the path of the Boogie executable used by Carbon
 - `nagini.verification.timeout`: specify the time limit for a verification process
+- `nagini.verification.additionalArguments`: specify additional command-line arguments passed to Nagini during verification (each list item is one argument)
 
 ## Troubleshooting
 
 ### Orphaned server process
 
-Nagini's server process may continue running after the extension is deactivated 
-or VS Code is closed. If this happens, it needs to be terminated manually.
+Occasionally, Nagini's server process may continue running after the extension is deactivated or VS Code is closed. 
+If this happens, it needs to be terminated manually.
