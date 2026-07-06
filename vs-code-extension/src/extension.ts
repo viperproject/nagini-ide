@@ -77,6 +77,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
         vscode.commands.registerCommand('nagini.startVerification', async () => {
             await commands.startVerification(_verificationState);
         }),
+        vscode.commands.registerCommand('nagini.verifyFunction', async () => {
+            await commands.verifyFunction(_verificationState);
+        }),
         vscode.commands.registerCommand('nagini.stopVerification', async () => {
             await commands.stopVerification(_verificationState);
         })

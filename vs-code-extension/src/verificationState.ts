@@ -37,13 +37,14 @@ export function initializeState(): VerificationState {
     return { serverMode, activeBackend, server, activeVerificationSession };
 }
 
-export function getNaginiCommandArgs(verificationState: VerificationState, fileName: string, settings: { boogieExecutablePath: string | undefined; additionalArguments: string[] }): string[] {
+export function getNaginiCommandArgs(verificationState: VerificationState, fileName: string, settings: { boogieExecutablePath: string | undefined; additionalArguments: string[] }, select?: string): string[] {
     const backend: Backend = verificationState.activeBackend;
     const boogiePath: string | undefined = settings.boogieExecutablePath;
     return [
         '--ide-mode',
         '--verifier', backend,
         ...(backend === 'carbon' && boogiePath ? ['--boogie', boogiePath] : []),
+        ...(select ? [`--select=${select}`] : []),
         ...settings.additionalArguments,
         fileName
     ];
@@ -62,6 +63,9 @@ export function getNaginiServerCommandArgs(verificationState: VerificationState,
     ];
 }
 
-export function getNaginiClientCommandArgs(fileName: string): string[] {
-    return [fileName];
+export function getNaginiClientCommandArgs(fileName: string, select?: string): string[] {
+    return [
+        fileName,
+        ...(select ? [`--select=${select}`] : [])
+    ];
 }

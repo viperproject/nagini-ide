@@ -8,9 +8,13 @@
 import * as vscode from 'vscode';
 
 export function getSettings(): { boogieExecutablePath: string | undefined; verificationTimeout: number | undefined; additionalArguments: string[] } {
-    let boogieExecutablePath: string | undefined = vscode.workspace.getConfiguration('nagini').get<string>('paths.boogieExecutable');
-    let verificationTimeout: number | undefined = vscode.workspace.getConfiguration('nagini').get<number>('verification.timeout');
-    const additionalArguments: string[] = vscode.workspace.getConfiguration('nagini').get<string[]>('verification.additionalArguments') ?? [];
+    // Resolve the configuration against the active document so that folder-scoped values (in
+    // multi-root workspaces) are read from the same scope the Settings UI writes them to.
+    const resource: vscode.Uri | undefined = vscode.window.activeTextEditor?.document.uri;
+    const configuration: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('nagini', resource);
+    let boogieExecutablePath: string | undefined = configuration.get<string>('paths.boogieExecutable');
+    let verificationTimeout: number | undefined = configuration.get<number>('verification.timeout');
+    const additionalArguments: string[] = configuration.get<string[]>('verification.additionalArguments') ?? [];
     if (verificationTimeout === undefined) {
         verificationTimeout = 60000;
     } else if (verificationTimeout === 0) {

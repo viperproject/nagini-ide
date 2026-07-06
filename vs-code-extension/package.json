@@ -57,6 +57,10 @@
         "icon": "$(unverified)"
       },
       {
+        "command": "nagini.verifyFunction",
+        "title": "Nagini: Verify Function at Cursor"
+      },
+      {
         "command": "nagini.stopVerification",
         "title": "Nagini: Stop Verification"
       }
@@ -67,6 +71,12 @@
         "key": "f5",
         "mac": "f5",
         "when": "resourceLangId == python"
+      },
+      {
+        "command": "nagini.verifyFunction",
+        "key": "ctrl+f5",
+        "mac": "cmd+f5",
+        "when": "resourceLangId == python && editorTextFocus"
       },
       {
         "command": "nagini.stopVerification",
@@ -103,7 +113,19 @@
           "group": "Nagini"
         },
         {
+          "command": "nagini.verifyFunction",
+          "when": "resourceLangId == python",
+          "group": "Nagini"
+        },
+        {
           "command": "nagini.stopVerification",
+          "when": "resourceLangId == python",
+          "group": "Nagini"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "nagini.verifyFunction",
           "when": "resourceLangId == python",
           "group": "Nagini"
         }

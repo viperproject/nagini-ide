@@ -233,8 +233,8 @@ export async function selectBackend(verificationState: VerificationState): Promi
 }
 
 let startVerificationQueue: Promise<void> = Promise.resolve();
-export async function startVerification(verificationState: VerificationState): Promise<void> {
-    logOutputChannel.info('Verification registered');
+export async function startVerification(verificationState: VerificationState, select?: string): Promise<void> {
+    logOutputChannel.info(select ? `Verification registered (selection: ${select})` : 'Verification registered');
 
     const activeEditor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
     if (!activeEditor) {
@@ -256,6 +256,7 @@ export async function startVerification(verificationState: VerificationState): P
         logOutputChannel.info('Verification starting...');
 
         const settings: { boogieExecutablePath: string | undefined; verificationTimeout: number | undefined; additionalArguments: string[]; } = getSettings();
+        logOutputChannel.info(`Verification settings read. Backend: ${verificationState.activeBackend}, Boogie path: ${settings.boogieExecutablePath ?? '<unset>'}`);
 
         if (verificationState.activeBackend === 'carbon' && !settings.boogieExecutablePath?.trim()) {
             logOutputChannel.info('Verification cancelled. Reason: the VCG (Carbon) backend requires a Boogie executable, but none is configured');
@@ -279,8 +280,8 @@ export async function startVerification(verificationState: VerificationState): P
         const uri: vscode.Uri = activeEditor.document.uri;
         const file: string = uri.fsPath;
         const fileName: string = path.basename(file);
-        const args: string[] = getNaginiCommandArgs(verificationState, file, settings);
-        const clientArgs: string[] = getNaginiClientCommandArgs(file);
+        const args: string[] = getNaginiCommandArgs(verificationState, file, settings, select);
+        const clientArgs: string[] = getNaginiClientCommandArgs(file, select);
 
         diagnosticCollection.delete(uri);
 
@@ -298,7 +299,7 @@ export async function startVerification(verificationState: VerificationState): P
         }
 
         stopVerificationButton.show();
-        updateStatusItem(`Nagini is verifying ${fileName} $(loading~spin)`, 'running');
+        updateStatusItem(`Nagini is verifying ${select ? `${select} in ${fileName}` : fileName} $(loading~spin)`, 'running');
 
         const session: VerificationSession = (() => {
             let resolveTermination!: () => void;
@@ -362,6 +363,26 @@ export async function startVerification(verificationState: VerificationState): P
     await startVerificationQueue;
 }
 
+export async function verifyFunction(verificationState: VerificationState): Promise<void> {
+    logOutputChannel.info('Function verification registered');
+
+    const activeEditor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+    if (!activeEditor) {
+        logOutputChannel.info('Function verification cancelled. Reason: no active editor');
+        vscode.window.showErrorMessage('Function verification cancelled: no active editor');
+        return;
+    }
+
+    const select: string | undefined = await getSelectionName(activeEditor);
+    if (!select) {
+        logOutputChannel.info('Function verification cancelled. Reason: no function or method at the cursor');
+        vscode.window.showErrorMessage('Nagini: place the cursor inside a function or method to verify it');
+        return;
+    }
+
+    await startVerification(verificationState, select);
+}
+
 let stopVerificationQueue: Promise<void> = Promise.resolve();
 export async function stopVerification(verificationState: VerificationState): Promise<void> {
     stopVerificationQueue = stopVerificationQueue.finally(async () => {
@@ -380,6 +401,34 @@ export async function stopVerification(verificationState: VerificationState): Pr
 function finalizeVerificationSession(verificationState: VerificationState, session: VerificationSession): void {
     verificationState.activeVerificationSession = undefined;
     session.resolveTermination();
+}
+
+// Resolves the Nagini --select name for the definition under the cursor, using the symbol
+// tree from the Python language server. Returns the innermost enclosing function/method,
+// prefixed by its enclosing class if any ('Class.method' or 'function') — the forms Nagini's
+// --select matches. Returns undefined if the cursor is not inside a function or method.
+async function getSelectionName(editor: vscode.TextEditor): Promise<string | undefined> {
+    const symbols: vscode.DocumentSymbol[] | undefined = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>(
+        'vscode.executeDocumentSymbolProvider', editor.document.uri);
+    if (!symbols) { return undefined; }
+
+    const position: vscode.Position = editor.selection.active;
+    const chain: vscode.DocumentSymbol[] = [];
+    let level: vscode.DocumentSymbol[] = symbols;
+    for (;;) {
+        const node: vscode.DocumentSymbol | undefined = level.find((symbol: vscode.DocumentSymbol) => symbol.range.contains(position));
+        if (!node) { break; }
+        chain.push(node);
+        level = node.children;
+    }
+
+    const isDefinition = (kind: vscode.SymbolKind): boolean =>
+        kind === vscode.SymbolKind.Function || kind === vscode.SymbolKind.Method;
+    const target: vscode.DocumentSymbol | undefined = [...chain].reverse().find((symbol: vscode.DocumentSymbol) => isDefinition(symbol.kind));
+    if (!target) { return undefined; }
+
+    const enclosingClass: vscode.DocumentSymbol | undefined = chain.find((symbol: vscode.DocumentSymbol) => symbol.kind === vscode.SymbolKind.Class);
+    return enclosingClass ? `${enclosingClass.name}.${target.name}` : target.name;
 }
 
 // Nagini prints its result marker ('Translation failed', 'Verification failed',

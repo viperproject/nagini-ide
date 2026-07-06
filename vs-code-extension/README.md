@@ -21,6 +21,7 @@ This extension provides the following commands:
 - `Nagini: Toggle Mode`: activate/deactivate server mode
 - `Nagini: Select Backend`: select the backend verifier
 - `Nagini: Start Verification`: start a new verification process
+- `Nagini: Verify Function at Cursor`: verify only the function or method at the cursor position
 - `Nagini: Stop Verification`: stop the current verification process
 
 ### Settings
