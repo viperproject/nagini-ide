@@ -29,9 +29,9 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     const activeEditor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
     if (activeEditor?.document.languageId === 'python') {
         const naginiPath: string = await getNaginiPathFromEditor(activeEditor);
-        await extState.welcome(naginiPath);
+        await extState.welcome(activeEditor.document.uri);
         syntaxHighlighter.highlight(activeEditor);
-        if (_verificationState.serverMode && await checkNaginiInstallation(naginiPath)) {
+        if (_verificationState.serverMode && await checkNaginiInstallation(activeEditor.document.uri)) {
             try {
                 await _verificationState.server.ensureRunning(_verificationState, naginiPath);
             } catch (error: Error | unknown) {
@@ -43,8 +43,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor(async (editor: vscode.TextEditor | undefined) => {
             if (editor?.document.languageId === 'python') {
-                const naginiPath: string = await getNaginiPathFromEditor(editor);
-                await extState.welcome(naginiPath);
+                await extState.welcome(editor.document.uri);
             } else {
                 await commands.stopVerification(_verificationState);
                 extState.hideStatusBar();
