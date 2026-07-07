@@ -18,7 +18,7 @@ This extension provides the following commands:
 
 - `Nagini: Select Environment`: select a Python environment
 - `Nagini: Install Nagini`: install Nagini from source
-- `Nagini: Toggle Mode`: activate/deactivate server mode
+- `Nagini: Toggle Mode`: switch between Server mode (a persistent Nagini server) and Direct mode (a separate Nagini process per verification)
 - `Nagini: Select Backend`: select the backend verifier
 - `Nagini: Start Verification`: start a new verification process
 - `Nagini: Verify Function at Cursor`: verify only the function or method at the cursor position

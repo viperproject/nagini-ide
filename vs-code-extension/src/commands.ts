@@ -224,7 +224,7 @@ export async function toggleMode(verificationState: VerificationState): Promise<
                 await handleServerStartFailure(verificationState, error);
             }
         }
-        logOutputChannel.info(`Mode toggle finished. Current mode: ${verificationState.serverMode ? 'Server' : 'Local'}`);
+        logOutputChannel.info(`Mode toggle finished. Current mode: ${verificationState.serverMode ? 'Server' : 'Direct'}`);
     });
     await toggleModeQueue;
 }
