@@ -54,7 +54,7 @@
       {
         "command": "nagini.startVerification",
         "title": "Nagini: Start Verification",
-        "icon": "$(unverified)"
+        "icon": "images/nagini_icon.png"
       },
       {
         "command": "nagini.verifyFunction",
