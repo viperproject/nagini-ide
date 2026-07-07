@@ -11,7 +11,7 @@ import * as path from 'path';
 import { diagnosticCollection, logOutputChannel, stopVerificationButton } from './extensionState';
 import { updateToggleModeButton, updateSelectBackendButton, updateStatusItem } from './extensionState';
 import { VerificationState, VerificationSession, getNaginiCommandArgs, getNaginiClientCommandArgs } from './verificationState';
-import { checkNaginiInstallation, getNaginiPathFromEditor, getPythonPath, getPythonVersion, getSettings, parseDurationFromOutput, parseErrorsFromOutput } from './utils';
+import { checkNaginiInstallation, getNaginiPathFromEditor, getPythonPath, getPythonVersion, isGlobalPythonEnvironment, getSettings, parseDurationFromOutput, parseErrorsFromOutput } from './utils';
 
 let selectEnvironmentQueue: Promise<void> = Promise.resolve();
 export async function selectEnvironment(context: vscode.ExtensionContext, verificationState: VerificationState): Promise<void> {
@@ -110,6 +110,28 @@ export async function installNagini(context: vscode.ExtensionContext, verificati
         logOutputChannel.warn(`Could not determine the Python version before installing Nagini; proceeding. Nagini requires Python ${SUPPORTED_PYTHON_RANGE}.`);
     }
 
+    if (await isGlobalPythonEnvironment(activeEditor.document.uri) === true) {
+        logOutputChannel.info('Nagini installation: the selected interpreter is a global/system Python, not a virtual environment');
+        const select: string = 'Select Environment';
+        const installAnyway: string = 'Install Anyway';
+        const selection: string | undefined = await vscode.window.showWarningMessage(
+            'Nagini would be installed into a global/system Python interpreter rather than a virtual environment. ' +
+            'On many systems pip refuses this (externally managed environment), and it can interfere with system packages. ' +
+            'It is strongly recommended to select or create a virtual environment first.',
+            { modal: true },
+            select,
+            installAnyway
+        );
+        if (selection === select) {
+            vscode.commands.executeCommand('nagini.selectEnvironment');
+            return;
+        }
+        if (selection !== installAnyway) {
+            logOutputChannel.info('Nagini installation cancelled. Reason: user declined installing into a global interpreter');
+            return;
+        }
+    }
+
     const pythonPath: string = await getPythonPath(activeEditor.document.uri);
     const naginiPath: string = await getNaginiPathFromEditor(activeEditor);
 
@@ -136,6 +158,18 @@ export async function installNagini(context: vscode.ExtensionContext, verificati
                     if (failed) {
                         logOutputChannel.error(`Nagini installation process failed to spawn. Reason: ${stderr}`);
                         vscode.window.showErrorMessage(`Nagini installation process failed to spawn: ${stderr}`);
+                    } else if (/externally[- ]managed[- ]environment/i.test(`${stdout}\n${stderr}`)) {
+                        logOutputChannel.error(`Nagini installation failed: the selected Python installation is externally managed.\nstdout:\n${stdout}\nstderr:\n${stderr}`);
+                        const select: string = 'Select Environment';
+                        vscode.window.showErrorMessage(
+                            'Nagini installation failed: this Python installation is externally managed, so pip cannot install into it. ' +
+                            'Please select or create a virtual environment and try again.',
+                            select
+                        ).then((selection: string | undefined) => {
+                            if (selection === select) {
+                                vscode.commands.executeCommand('nagini.selectEnvironment');
+                            }
+                        });
                     } else if (code !== 0) {
                         logOutputChannel.error(`Nagini installation process exited with code ${code} and signal ${signal}\nstdout:\n${stdout}\nstderr:\n${stderr}`);
                         vscode.window.showErrorMessage(`Nagini installation process exited with code ${code} and signal ${signal}`);

@@ -61,6 +61,16 @@ export async function getPythonPath(uri: vscode.Uri): Promise<string> {
     return pythonPath;
 }
 
+export async function isGlobalPythonEnvironment(uri: vscode.Uri): Promise<boolean | undefined> {
+    const api: PythonExtension = await PythonExtension.api();
+    const envPath: EnvironmentPath = api.environments.getActiveEnvironmentPath(uri);
+    const resolvedEnv: ResolvedEnvironment | undefined = await api.environments.resolveEnvironment(envPath);
+    if (resolvedEnv === undefined) { return undefined; }
+    // `environment` is populated for virtual/conda/etc. environments and is undefined for
+    // global or system interpreters.
+    return resolvedEnv.environment === undefined;
+}
+
 export async function getPythonVersion(uri: vscode.Uri): Promise<{ major: number; minor: number } | undefined> {
     // Query the interpreter directly rather than trusting the Python extension's reported
     // version metadata, which can be stale or wrong for some environments.
