@@ -72,8 +72,7 @@ export async function selectEnvironment(context: vscode.ExtensionContext, verifi
             try {
                 await verificationState.server.ensureRunning(verificationState, naginiPath);
             } catch (error: Error | unknown) {
-                logOutputChannel.error(`Server failed to start: ${(error as Error).message}`);
-                vscode.window.showErrorMessage(`Server failed to start: ${(error as Error).message}`);
+                await handleServerStartFailure(verificationState, error);
             }
         }
         logOutputChannel.info(`Environment selection finished. Current Python path: ${await getPythonPath(activeEditor.document.uri)}`);
@@ -181,8 +180,7 @@ export async function installNagini(context: vscode.ExtensionContext, verificati
                             try {
                                 await verificationState.server.ensureRunning(verificationState, naginiPath);
                             } catch (error: Error | unknown) {
-                                logOutputChannel.error(`Server failed to start: ${(error as Error).message}`);
-                                vscode.window.showErrorMessage(`Server failed to start: ${(error as Error).message}`);
+                                await handleServerStartFailure(verificationState, error);
                             }
                         }
                     }
@@ -223,8 +221,7 @@ export async function toggleMode(verificationState: VerificationState): Promise<
             try {
                 await verificationState.server.ensureRunning(verificationState, naginiPath);
             } catch (error: Error | unknown) {
-                logOutputChannel.error(`Server failed to start: ${(error as Error).message}`);
-                vscode.window.showErrorMessage(`Server failed to start: ${(error as Error).message}`);
+                await handleServerStartFailure(verificationState, error);
             }
         }
         logOutputChannel.info(`Mode toggle finished. Current mode: ${verificationState.serverMode ? 'Server' : 'Local'}`);
@@ -276,8 +273,7 @@ export async function selectBackend(verificationState: VerificationState): Promi
             try {
                 await verificationState.server.ensureRunning(verificationState, naginiPath);
             } catch (error: Error | unknown) {
-                logOutputChannel.error(`Server failed to start: ${(error as Error).message}`);
-                vscode.window.showErrorMessage(`Server failed to start: ${(error as Error).message}`);
+                await handleServerStartFailure(verificationState, error);
             }
         }
         logOutputChannel.info(`Backend selection finished. Current backend: ${verificationState.activeBackend}`);
@@ -343,9 +339,8 @@ export async function startVerification(verificationState: VerificationState, se
             try {
                 await verificationState.server.ensureRunning(verificationState, naginiPath);
             } catch (error: Error | unknown) {
-                logOutputChannel.error(`Server failed to start: ${(error as Error).message}`);
                 updateStatusItem(`$(x) Nagini failed to start the server`, 'error');
-                vscode.window.showErrorMessage(`Server failed to start: ${(error as Error).message}`);
+                await handleServerStartFailure(verificationState, error);
                 logOutputChannel.info(`Verification finished`);
                 return;
             }
@@ -454,6 +449,31 @@ export async function stopVerification(verificationState: VerificationState): Pr
 function finalizeVerificationSession(verificationState: VerificationState, session: VerificationSession): void {
     verificationState.activeVerificationSession = undefined;
     session.resolveTermination();
+}
+
+// Reports a failure to start the Nagini server. When the failure is a port conflict (another
+// server is already bound to the socket), offers to disable server mode so verification can
+// still run with a separate Nagini process per file.
+export async function handleServerStartFailure(verificationState: VerificationState, error: Error | unknown): Promise<void> {
+    const message: string = (error as Error).message;
+    logOutputChannel.error(`Server failed to start: ${message}`);
+    if (/address already in use|EADDRINUSE/i.test(message)) {
+        const disable: string = 'Disable Server Mode';
+        const selection: string | undefined = await vscode.window.showErrorMessage(
+            'Nagini could not start its server because its port (127.0.0.1:5555) is already in use, ' +
+            'most likely because another Nagini server is already running on this machine. ' +
+            'You can disable server mode to verify each file with a separate Nagini process instead.',
+            disable
+        );
+        if (selection === disable && verificationState.serverMode) {
+            await verificationState.server.stop();
+            verificationState.serverMode = false;
+            updateToggleModeButton(verificationState);
+            logOutputChannel.info('Server mode disabled by user after a port conflict.');
+        }
+    } else {
+        vscode.window.showErrorMessage(`Server failed to start: ${message}`);
+    }
 }
 
 // Nagini supports Python 3.12 through 3.14 (inclusive).
