@@ -90,8 +90,8 @@ export function updateStatusItem(text: string, status?: Status): void {
     }
 }
 
-export async function welcome(naginiPath: string): Promise<void>  {
-    updateStatusItem(await checkNaginiInstallation(naginiPath) ? 'Nagini is ready' : 'Nagini is not installed', 'idle');
+export async function welcome(uri: vscode.Uri): Promise<void>  {
+    updateStatusItem(await checkNaginiInstallation(uri) ? 'Nagini is ready' : 'Nagini is not installed or is outdated', 'idle');
     showStatusBar();
 }
 

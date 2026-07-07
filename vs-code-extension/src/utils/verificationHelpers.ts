@@ -11,8 +11,46 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { PythonExtension, EnvironmentPath, ResolvedEnvironment } from '@vscode/python-extension';
 
-export async function checkNaginiInstallation(naginiPath: string): Promise<boolean> {
-    return fs.existsSync(naginiPath);
+// Minimum Nagini version this extension requires. An installed but older Nagini is treated the
+// same as no installation at all.
+const MINIMUM_NAGINI_VERSION: readonly number[] = [1, 3, 1];
+export const MINIMUM_NAGINI_VERSION_STRING: string = MINIMUM_NAGINI_VERSION.join('.');
+
+export async function checkNaginiInstallation(uri: vscode.Uri): Promise<boolean> {
+    let pythonPath: string;
+    try {
+        pythonPath = await getPythonPath(uri);
+    } catch {
+        return false;
+    }
+    const version: string | undefined = await getNaginiVersion(pythonPath);
+    return version !== undefined && isVersionAtLeast(version, MINIMUM_NAGINI_VERSION);
+}
+
+// Reads the installed Nagini distribution's version via importlib.metadata (the same package
+// metadata pip records), or undefined if Nagini is not installed for this interpreter.
+async function getNaginiVersion(pythonPath: string): Promise<string | undefined> {
+    return new Promise((resolve: (value: string | undefined) => void) => {
+        const process: cp.ChildProcess = cp.spawn(pythonPath, ['-c', 'import importlib.metadata as m; print(m.version("nagini"))']);
+        let stdout: string = '';
+        process.stdout?.on('data', (data: Buffer) => { stdout += data.toString(); });
+        process.on('error', () => resolve(undefined));
+        process.on('close', (code: number | null) => {
+            const version: string = stdout.trim();
+            resolve(code === 0 && version.length > 0 ? version : undefined);
+        });
+    });
+}
+
+function isVersionAtLeast(version: string, minimum: readonly number[]): boolean {
+    const parts: number[] = version.split('.').map((part: string) => parseInt(part, 10));
+    for (let i: number = 0; i < minimum.length; i++) {
+        const raw: number | undefined = parts[i];
+        const value: number = (raw === undefined || Number.isNaN(raw)) ? 0 : raw;
+        if (value > minimum[i]) { return true; }
+        if (value < minimum[i]) { return false; }
+    }
+    return true;
 }
 
 export async function getNaginiPathFromEditor(editor: vscode.TextEditor, serverMode: boolean = false): Promise<string> {

@@ -11,7 +11,7 @@ import * as path from 'path';
 import { diagnosticCollection, logOutputChannel, stopVerificationButton } from './extensionState';
 import { updateToggleModeButton, updateSelectBackendButton, updateStatusItem } from './extensionState';
 import { VerificationState, VerificationSession, getNaginiCommandArgs, getNaginiClientCommandArgs } from './verificationState';
-import { checkNaginiInstallation, getNaginiPathFromEditor, getPythonPath, getPythonVersion, isGlobalPythonEnvironment, getSettings, parseDurationFromOutput, parseErrorsFromOutput } from './utils';
+import { checkNaginiInstallation, getNaginiPathFromEditor, getPythonPath, getPythonVersion, isGlobalPythonEnvironment, getSettings, parseDurationFromOutput, parseErrorsFromOutput, MINIMUM_NAGINI_VERSION_STRING } from './utils';
 
 let selectEnvironmentQueue: Promise<void> = Promise.resolve();
 export async function selectEnvironment(context: vscode.ExtensionContext, verificationState: VerificationState): Promise<void> {
@@ -43,10 +43,10 @@ export async function selectEnvironment(context: vscode.ExtensionContext, verifi
             }
             naginiPath = await getNaginiPathFromEditor(activeEditor);
 
-            if (await checkNaginiInstallation(naginiPath)) {
+            if (await checkNaginiInstallation(activeEditor.document.uri)) {
                 updateStatusItem('Nagini is ready', 'idle');
             } else {
-                updateStatusItem('Nagini is not installed', 'idle');
+                updateStatusItem('Nagini is not installed or is outdated', 'idle');
 
                 const select: string = 'Select another environment';
                 const install: string = 'Install Nagini in the current environment';
@@ -68,7 +68,7 @@ export async function selectEnvironment(context: vscode.ExtensionContext, verifi
             }
         } while (retry);
 
-        if (verificationState.serverMode && await checkNaginiInstallation(naginiPath)) {
+        if (verificationState.serverMode && await checkNaginiInstallation(activeEditor.document.uri)) {
             try {
                 await verificationState.server.ensureRunning(verificationState, naginiPath);
             } catch (error: Error | unknown) {
@@ -176,7 +176,7 @@ export async function installNagini(context: vscode.ExtensionContext, verificati
                         updateStatusItem('Nagini is ready', 'idle');
                         logOutputChannel.info(`Nagini installation process finished. Result: Success\nstdout:\n${stdout}\nstderr:\n${stderr}`);
                         vscode.window.showInformationMessage('Nagini installation succeeded');
-                        if (verificationState.serverMode && await checkNaginiInstallation(naginiPath)) {
+                        if (verificationState.serverMode && await checkNaginiInstallation(activeEditor.document.uri)) {
                             try {
                                 await verificationState.server.ensureRunning(verificationState, naginiPath);
                             } catch (error: Error | unknown) {
@@ -204,7 +204,7 @@ export async function toggleMode(verificationState: VerificationState): Promise<
         return;
     }
     const naginiPath: string = await getNaginiPathFromEditor(activeEditor);
-    if (!await checkNaginiInstallation(naginiPath)) {
+    if (!await checkNaginiInstallation(activeEditor.document.uri)) {
         logOutputChannel.info('Mode toggle cancelled. Reason: Nagini is not installed');
         showErrorMessageWithAction('Mode toggle');
         return;
@@ -240,7 +240,7 @@ export async function selectBackend(verificationState: VerificationState): Promi
         return;
     }
     const naginiPath: string = await getNaginiPathFromEditor(activeEditor);
-    if (!await checkNaginiInstallation(naginiPath)) {
+    if (!await checkNaginiInstallation(activeEditor.document.uri)) {
         logOutputChannel.info('Backend selection cancelled. Reason: Nagini is not installed');
         showErrorMessageWithAction('Backend selection');
         return;
@@ -293,7 +293,7 @@ export async function startVerification(verificationState: VerificationState, se
     }
     const naginiPath: string = await getNaginiPathFromEditor(activeEditor, false);
     const naginiClientPath: string = await getNaginiPathFromEditor(activeEditor, true);
-    if (!await checkNaginiInstallation(naginiPath)) {
+    if (!await checkNaginiInstallation(activeEditor.document.uri)) {
         logOutputChannel.info('Verification cancelled. Reason: Nagini is not installed');
         showErrorMessageWithAction('Verification');
         return;
@@ -527,7 +527,7 @@ function stdoutHasResultLine(stdout: string, marker: string): boolean {
 }
 
 async function showErrorMessageWithAction(context: string): Promise<void> {
-    const message: string = `${context} cancelled: Nagini is not installed. Please select another virtual environment or install Nagini in the current environment.`;
+    const message: string = `${context} cancelled: Nagini is not installed or is outdated (version ${MINIMUM_NAGINI_VERSION_STRING} or newer is required). Please select another virtual environment or install Nagini in the current environment.`;
     const select: string = 'Select';
     const install: string = 'Install';
     const selection: string | undefined = await vscode.window.showErrorMessage(message, select, install);
