@@ -11,7 +11,7 @@ import * as path from 'path';
 import { diagnosticCollection, logOutputChannel, stopVerificationButton } from './extensionState';
 import { updateToggleModeButton, updateSelectBackendButton, updateStatusItem } from './extensionState';
 import { VerificationState, VerificationSession, getNaginiCommandArgs, getNaginiClientCommandArgs } from './verificationState';
-import { checkNaginiInstallation, getNaginiPathFromEditor, getPythonPath, getSettings, parseDurationFromOutput, parseErrorsFromOutput } from './utils';
+import { checkNaginiInstallation, getNaginiPathFromEditor, getPythonPath, getPythonVersion, getSettings, parseDurationFromOutput, parseErrorsFromOutput } from './utils';
 
 let selectEnvironmentQueue: Promise<void> = Promise.resolve();
 export async function selectEnvironment(context: vscode.ExtensionContext, verificationState: VerificationState): Promise<void> {
@@ -91,6 +91,25 @@ export async function installNagini(context: vscode.ExtensionContext, verificati
         vscode.window.showErrorMessage('Nagini installation cancelled: no active editor');
         return;
     }
+    const version: { major: number; minor: number } | undefined = await getPythonVersion(activeEditor.document.uri);
+    logOutputChannel.info(`Nagini installation: resolved Python version ${version ? `${version.major}.${version.minor}` : '<unknown>'}`);
+    if (version && !isSupportedPythonVersion(version)) {
+        const versionString: string = `${version.major}.${version.minor}`;
+        logOutputChannel.info(`Nagini installation cancelled. Reason: unsupported Python version ${versionString}`);
+        const select: string = 'Select Environment';
+        const selection: string | undefined = await vscode.window.showErrorMessage(
+            `Nagini installation cancelled: Python ${versionString} is not supported. Nagini requires Python ${SUPPORTED_PYTHON_RANGE}. Please select a compatible environment.`,
+            select
+        );
+        if (selection === select) {
+            vscode.commands.executeCommand('nagini.selectEnvironment');
+        }
+        return;
+    }
+    if (version === undefined) {
+        logOutputChannel.warn(`Could not determine the Python version before installing Nagini; proceeding. Nagini requires Python ${SUPPORTED_PYTHON_RANGE}.`);
+    }
+
     const pythonPath: string = await getPythonPath(activeEditor.document.uri);
     const naginiPath: string = await getNaginiPathFromEditor(activeEditor);
 
@@ -401,6 +420,19 @@ export async function stopVerification(verificationState: VerificationState): Pr
 function finalizeVerificationSession(verificationState: VerificationState, session: VerificationSession): void {
     verificationState.activeVerificationSession = undefined;
     session.resolveTermination();
+}
+
+// Nagini supports Python 3.12 through 3.14 (inclusive).
+const MIN_SUPPORTED_PYTHON: { major: number; minor: number } = { major: 3, minor: 12 };
+const MAX_SUPPORTED_PYTHON: { major: number; minor: number } = { major: 3, minor: 14 };
+const SUPPORTED_PYTHON_RANGE: string = `${MIN_SUPPORTED_PYTHON.major}.${MIN_SUPPORTED_PYTHON.minor}–${MAX_SUPPORTED_PYTHON.major}.${MAX_SUPPORTED_PYTHON.minor}`;
+
+export function isSupportedPythonVersion(version: { major: number; minor: number }): boolean {
+    const atLeastMin: boolean = version.major > MIN_SUPPORTED_PYTHON.major ||
+        (version.major === MIN_SUPPORTED_PYTHON.major && version.minor >= MIN_SUPPORTED_PYTHON.minor);
+    const atMostMax: boolean = version.major < MAX_SUPPORTED_PYTHON.major ||
+        (version.major === MAX_SUPPORTED_PYTHON.major && version.minor <= MAX_SUPPORTED_PYTHON.minor);
+    return atLeastMin && atMostMax;
 }
 
 // Resolves the Nagini --select name for the definition under the cursor, using the symbol

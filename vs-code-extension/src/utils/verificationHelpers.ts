@@ -61,6 +61,31 @@ export async function getPythonPath(uri: vscode.Uri): Promise<string> {
     return pythonPath;
 }
 
+export async function getPythonVersion(uri: vscode.Uri): Promise<{ major: number; minor: number } | undefined> {
+    // Query the interpreter directly rather than trusting the Python extension's reported
+    // version metadata, which can be stale or wrong for some environments.
+    let pythonPath: string;
+    try {
+        pythonPath = await getPythonPath(uri);
+    } catch {
+        return undefined;
+    }
+    return new Promise((resolve: (value: { major: number; minor: number } | undefined) => void) => {
+        const process: cp.ChildProcess = cp.spawn(pythonPath, ['-c', 'import sys; print(sys.version_info[0], sys.version_info[1])']);
+        let stdout: string = '';
+        process.stdout?.on('data', (data: Buffer) => { stdout += data.toString(); });
+        process.on('error', () => resolve(undefined));
+        process.on('close', (code: number | null) => {
+            const match: RegExpMatchArray | null = stdout.trim().match(/^(\d+)\s+(\d+)/);
+            if (code !== 0 || !match) {
+                resolve(undefined);
+                return;
+            }
+            resolve({ major: parseInt(match[1]), minor: parseInt(match[2]) });
+        });
+    });
+}
+
 export function parseDurationFromOutput(message: string): number {
     const regExp: RegExp = /Verification took (\d+(?:\.\d+)?) seconds\./;
     const match: RegExpExecArray | null = regExp.exec(message);
