@@ -35,8 +35,7 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             try {
                 await _verificationState.server.ensureRunning(_verificationState, naginiPath);
             } catch (error: Error | unknown) {
-                logOutputChannel.error(`Server failed to start: ${(error as Error).message}`);
-                vscode.window.showErrorMessage(`Server failed to start: ${(error as Error).message}`);
+                await commands.handleServerStartFailure(_verificationState, error);
             }
         }
     }

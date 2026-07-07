@@ -22,17 +22,30 @@ export async function getNaginiPathFromEditor(editor: vscode.TextEditor, serverM
 }
 
 async function getNaginiPath(pythonPath: string, serverMode: boolean = false): Promise<string> {
-    const scriptsDirectory: string = await getPythonScriptsDirectory(pythonPath);
-    if (process.platform === 'win32') {
-        return path.join(scriptsDirectory, serverMode ? 'nagini_client.exe' : 'nagini.exe');
-    } else {
-        return path.join(scriptsDirectory, serverMode ? 'nagini_client' : 'nagini');
-    }
+    const executable: string = process.platform === 'win32'
+        ? (serverMode ? 'nagini_client.exe' : 'nagini.exe')
+        : (serverMode ? 'nagini_client' : 'nagini');
+    const scriptsDirectories: string[] = await getPythonScriptsDirectories(pythonPath);
+    const candidates: string[] = scriptsDirectories.map((directory: string) => path.join(directory, executable));
+    // Prefer a location that actually contains the executable; pip may install into the user
+    // scripts directory (a --user install) when the interpreter's site-packages is not writeable.
+    return candidates.find((candidate: string) => fs.existsSync(candidate)) ?? candidates[0];
 }
 
-async function getPythonScriptsDirectory(pythonPath: string): Promise<string> {
-    return new Promise((resolve: (value: string) => void, reject: (reason: Error) => void) => {
-        const process: cp.ChildProcess = cp.spawn(pythonPath, ['-c', 'import sysconfig; print(sysconfig.get_path(\'scripts\'))']);
+// Returns the interpreter's default scripts directory and, when available, the per-user scripts
+// directory, so that both regular and --user installs of Nagini can be located.
+async function getPythonScriptsDirectories(pythonPath: string): Promise<string[]> {
+    const script: string = [
+        'import sysconfig, json',
+        'dirs = [sysconfig.get_path("scripts")]',
+        'try:',
+        '    dirs.append(sysconfig.get_path("scripts", sysconfig.get_preferred_scheme("user")))',
+        'except Exception:',
+        '    pass',
+        'print(json.dumps(dirs))'
+    ].join('\n');
+    return new Promise((resolve: (value: string[]) => void, reject: (reason: Error) => void) => {
+        const process: cp.ChildProcess = cp.spawn(pythonPath, ['-c', script]);
         let stdout: string = '';
         let stderr: string = '';
         process.stdout?.on('data', (data: Buffer) => stdout += data.toString());
@@ -43,11 +56,18 @@ async function getPythonScriptsDirectory(pythonPath: string): Promise<string> {
         process.on('close', (code: number | null, signal: string | null) => {
             stdout = stdout.trim();
             stderr = stderr.trim();
-            if (code === 0) {
-                resolve(stdout);
-            } else {
+            if (code !== 0) {
                 reject(new Error(`Python process \'${pythonPath} ${process.spawnargs.join(' ')}\' failed with code ${code} and signal ${signal}: ${stderr}`));
+                return;
             }
+            let directories: string[];
+            try {
+                directories = (JSON.parse(stdout) as string[]).filter((directory: string) => typeof directory === 'string' && directory.length > 0);
+            } catch {
+                directories = stdout ? [stdout] : [];
+            }
+            // De-duplicate while preserving order (default scripts directory first).
+            resolve(directories.filter((directory: string, index: number) => directories.indexOf(directory) === index));
         });
     });
 }
@@ -59,6 +79,16 @@ export async function getPythonPath(uri: vscode.Uri): Promise<string> {
     const pythonPath: string | undefined = resolvedEnv?.executable?.uri?.fsPath;
     if (!pythonPath) { throw new Error(`No Python interpreter selected for ${uri.fsPath}`); }
     return pythonPath;
+}
+
+export async function isGlobalPythonEnvironment(uri: vscode.Uri): Promise<boolean | undefined> {
+    const api: PythonExtension = await PythonExtension.api();
+    const envPath: EnvironmentPath = api.environments.getActiveEnvironmentPath(uri);
+    const resolvedEnv: ResolvedEnvironment | undefined = await api.environments.resolveEnvironment(envPath);
+    if (resolvedEnv === undefined) { return undefined; }
+    // `environment` is populated for virtual/conda/etc. environments and is undefined for
+    // global or system interpreters.
+    return resolvedEnv.environment === undefined;
 }
 
 export async function getPythonVersion(uri: vscode.Uri): Promise<{ major: number; minor: number } | undefined> {

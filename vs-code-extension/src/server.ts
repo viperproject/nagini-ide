@@ -81,12 +81,16 @@ export class Server {
             session.stderr = session.stderr.trim();
             if (session.failed) {
                 logOutputChannel.error(`Server process failed to spawn. Reason: ${session.stderr}`);
-                vscode.window.showErrorMessage(`Server process failed to spawn: ${session.stderr}`);
             } else if (session.killed) {
                 logOutputChannel.info(`Server process ${session.process.pid} finished. Result: Interruption`);
             } else if (code !== 0) {
                 logOutputChannel.error(`Server process failed. Reason: process exited with code ${code} and signal ${signal}\nstdout:\n${session.stdout}\nstderr:\n${session.stderr}`);
-                vscode.window.showErrorMessage(`Server process failed: process exited with code ${code} and signal ${signal}`);
+                // A pre-startup failure is reported to whoever awaited startup via the rejected
+                // ready promise; only surface a popup here for a crash after a successful start,
+                // when there is no longer anyone awaiting it.
+                if (session.serverStartedSuccessfully) {
+                    vscode.window.showErrorMessage(`Nagini server stopped unexpectedly: process exited with code ${code} and signal ${signal}`);
+                }
             } else {
                 logOutputChannel.info('Server process finished');
             }
@@ -128,7 +132,7 @@ function finalizeServerSession(session: ServerSession): void {
             ? session.stderr
             : session.killed
                 ? 'Server was stopped before it finished starting'
-                : 'Server process exited before it finished starting';
+                : (session.stderr || 'Server process exited before it finished starting');
         session.rejectReady(new Error(reason));
     }
     session.resolveTermination();

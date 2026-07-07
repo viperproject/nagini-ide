@@ -37,7 +37,7 @@ export function initializeState(context: vscode.ExtensionContext): void {
         syntaxHighlighter
     );
 
-    toggleModeButton.tooltip = 'Nagini: Toggle Server Mode';
+    toggleModeButton.tooltip = 'Nagini: Toggle Server/Direct Mode';
     toggleModeButton.command = 'nagini.toggleMode';
     selectBackendButton.tooltip = 'Nagini: Select the Backend Verifier';
     selectBackendButton.command = 'nagini.selectBackend';
@@ -49,7 +49,7 @@ export function initializeState(context: vscode.ExtensionContext): void {
 }
 
 export function updateToggleModeButton(verificationState: VerificationState): void {
-    toggleModeButton.text = verificationState.serverMode ? 'Server' : "Local";
+    toggleModeButton.text = verificationState.serverMode ? 'Server' : 'Direct';
 }
 
 export function updateSelectBackendButton(verificationState: VerificationState): void {
