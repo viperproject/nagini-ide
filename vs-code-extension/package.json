@@ -294,6 +294,9 @@
   "extensionDependencies": [
     "ms-python.python"
   ],
+  "extensionKind": [
+    "workspace"
+  ],
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
