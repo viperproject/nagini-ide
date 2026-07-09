@@ -26,20 +26,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     extState.updateStatusItem('Hello from Nagini');
     extState.showStatusBar();
 
-    const activeEditor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
-    if (activeEditor?.document.languageId === 'python') {
-        const naginiPath: string = await getNaginiPathFromEditor(activeEditor);
-        await extState.welcome(activeEditor.document.uri);
-        syntaxHighlighter.highlight(activeEditor);
-        if (_verificationState.serverMode && await checkNaginiInstallation(activeEditor.document.uri)) {
-            try {
-                await _verificationState.server.ensureRunning(_verificationState, naginiPath);
-            } catch (error: Error | unknown) {
-                await commands.handleServerStartFailure(_verificationState, error);
-            }
-        }
-    }
-
+    // Register commands and event listeners up front, before any awaited work that might throw.
+    // The interpreter-dependent startup below can fail (e.g. no Python interpreter is selected
+    // yet, which is common right after opening a window, notably in remote/WSL setups). If that
+    // happens before the commands are registered, VS Code reports "command not found" even though
+    // the buttons and palette entries (contributed statically) are visible.
     context.subscriptions.push(
         vscode.window.onDidChangeActiveTextEditor(async (editor: vscode.TextEditor | undefined) => {
             if (editor?.document.languageId === 'python') {
@@ -82,6 +73,24 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
             await commands.stopVerification(_verificationState);
         })
     );
+
+    const activeEditor: vscode.TextEditor | undefined = vscode.window.activeTextEditor;
+    if (activeEditor?.document.languageId === 'python') {
+        syntaxHighlighter.highlight(activeEditor);
+        try {
+            await extState.welcome(activeEditor.document.uri);
+            if (_verificationState.serverMode && await checkNaginiInstallation(activeEditor.document.uri)) {
+                const naginiPath: string = await getNaginiPathFromEditor(activeEditor);
+                try {
+                    await _verificationState.server.ensureRunning(_verificationState, naginiPath);
+                } catch (error: Error | unknown) {
+                    await commands.handleServerStartFailure(_verificationState, error);
+                }
+            }
+        } catch (error: Error | unknown) {
+            logOutputChannel.error(`Nagini startup could not complete: ${(error as Error).message}`);
+        }
+    }
 
     logOutputChannel.info('Nagini activation finished');
 }
