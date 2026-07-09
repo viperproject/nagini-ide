@@ -154,6 +154,23 @@ export async function getPythonVersion(uri: vscode.Uri): Promise<{ major: number
     });
 }
 
+// Checks whether pip is usable in the selected environment by invoking exactly the mechanism the
+// installation uses (`python -m pip`). Returns false if no interpreter is resolvable or pip is
+// missing.
+export async function isPipAvailable(uri: vscode.Uri): Promise<boolean> {
+    let pythonPath: string;
+    try {
+        pythonPath = await getPythonPath(uri);
+    } catch {
+        return false;
+    }
+    return new Promise((resolve: (value: boolean) => void) => {
+        const process: cp.ChildProcess = cp.spawn(pythonPath, ['-m', 'pip', '--version']);
+        process.on('error', () => resolve(false));
+        process.on('close', (code: number | null) => resolve(code === 0));
+    });
+}
+
 export function parseDurationFromOutput(message: string): number {
     const regExp: RegExp = /Verification took (\d+(?:\.\d+)?) seconds\./;
     const match: RegExpExecArray | null = regExp.exec(message);
