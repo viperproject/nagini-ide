@@ -11,7 +11,7 @@ import * as path from 'path';
 import { diagnosticCollection, logOutputChannel, stopVerificationButton } from './extensionState';
 import { updateToggleModeButton, updateSelectBackendButton, updateStatusItem } from './extensionState';
 import { VerificationState, VerificationSession, getNaginiCommandArgs, getNaginiClientCommandArgs } from './verificationState';
-import { checkNaginiInstallation, getNaginiPathFromEditor, getPythonPath, getPythonVersion, isGlobalPythonEnvironment, getSettings, parseDurationFromOutput, parseErrorsFromOutput, MINIMUM_NAGINI_VERSION_STRING } from './utils';
+import { checkNaginiInstallation, getNaginiPathFromEditor, getPythonPath, getPythonVersion, isGlobalPythonEnvironment, isPipAvailable, getSettings, parseDurationFromOutput, parseErrorsFromOutput, MINIMUM_NAGINI_VERSION_STRING } from './utils';
 
 let selectEnvironmentQueue: Promise<void> = Promise.resolve();
 export async function selectEnvironment(context: vscode.ExtensionContext, verificationState: VerificationState): Promise<void> {
@@ -107,6 +107,20 @@ export async function installNagini(context: vscode.ExtensionContext, verificati
     }
     if (version === undefined) {
         logOutputChannel.warn(`Could not determine the Python version before installing Nagini; proceeding. Nagini requires Python ${SUPPORTED_PYTHON_RANGE}.`);
+    }
+
+    if (!await isPipAvailable(activeEditor.document.uri)) {
+        logOutputChannel.info('Nagini installation cancelled. Reason: pip is not available in the selected environment');
+        const select: string = 'Select Environment';
+        const selection: string | undefined = await vscode.window.showErrorMessage(
+            'Nagini installation cancelled: the selected Python environment does not have pip available. ' +
+            'Please select an environment that has pip installed.',
+            select
+        );
+        if (selection === select) {
+            vscode.commands.executeCommand('nagini.selectEnvironment');
+        }
+        return;
     }
 
     if (await isGlobalPythonEnvironment(activeEditor.document.uri) === true) {
