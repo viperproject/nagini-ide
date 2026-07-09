@@ -120,13 +120,29 @@ export async function getPythonPath(uri: vscode.Uri): Promise<string> {
 }
 
 export async function isGlobalPythonEnvironment(uri: vscode.Uri): Promise<boolean | undefined> {
-    const api: PythonExtension = await PythonExtension.api();
-    const envPath: EnvironmentPath = api.environments.getActiveEnvironmentPath(uri);
-    const resolvedEnv: ResolvedEnvironment | undefined = await api.environments.resolveEnvironment(envPath);
-    if (resolvedEnv === undefined) { return undefined; }
-    // `environment` is populated for virtual/conda/etc. environments and is undefined for
-    // global or system interpreters.
-    return resolvedEnv.environment === undefined;
+    // Ask the interpreter itself rather than trusting the Python extension's environment metadata,
+    // which can be missing or wrong for some environments. A virtual environment (venv/virtualenv)
+    // has sys.prefix != sys.base_prefix (PEP 405); a global/system interpreter has them equal.
+    let pythonPath: string;
+    try {
+        pythonPath = await getPythonPath(uri);
+    } catch {
+        return undefined;
+    }
+    return new Promise((resolve: (value: boolean | undefined) => void) => {
+        const process: cp.ChildProcess = cp.spawn(pythonPath, ['-c', 'import sys; print(sys.prefix == sys.base_prefix)']);
+        let stdout: string = '';
+        process.stdout?.on('data', (data: Buffer) => { stdout += data.toString(); });
+        process.on('error', () => resolve(undefined));
+        process.on('close', (code: number | null) => {
+            const output: string = stdout.trim();
+            if (code !== 0 || (output !== 'True' && output !== 'False')) {
+                resolve(undefined);
+                return;
+            }
+            resolve(output === 'True');
+        });
+    });
 }
 
 export async function getPythonVersion(uri: vscode.Uri): Promise<{ major: number; minor: number } | undefined> {
